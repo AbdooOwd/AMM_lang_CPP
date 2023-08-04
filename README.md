@@ -4,7 +4,7 @@ It is a programming language that I made for fun.
 I originally made it in Python like 3 hours ago at the time I'm writing.
 It is ***A--*** or ***AMM*** and its file extension is ***`.amm`***
 
-> It was originally written in **Python** in (this repo)[https://github.com/AbdooOwd/AMM_lang_PY]
+> It was originally written in **Python** in [this repo](https://github.com/AbdooOwd/AMM_lang_PY).
 
 ### About A--'s idea
 I got it when I was like 12 years old. I always thought that programming languages

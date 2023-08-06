@@ -5,6 +5,7 @@
 ### Keywords
 * **`log`** - like `print()`
     * **Tip**: If you put a `-` after the `log` string, it will have no new line
+    * **Tip**: If you put a `~` in the `log` string, it adds a new line
 * **`input`** - but cannot *use*/*store* that input
 * **`var`** - to use it, use its ***M-Address***
 * **`getvars`** - ***DEV TOOL*** gets all the vars with their properties

@@ -1,6 +1,5 @@
 .vscode/*
 tests/*
 backups/*
-dev/*
 *.exe
 *.amm

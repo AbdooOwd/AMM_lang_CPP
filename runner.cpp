@@ -240,7 +240,16 @@ void run(const string& program) {
                 continue;
             }
             if (scanning_str == true) {
+                if (c == '\n') {
+                    scanned_str += " ";
+                    continue;
+                }
+                if (c == '~') {
+                    scanned_str += "\n";
+                    continue;
+                }
                 scanned_str += c;
+                continue;
             }
             if (double_quotes_count == 2) {
 

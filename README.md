@@ -32,6 +32,7 @@ and as a second argument put your `.amm` file path.
 ### NOTES
 * ***A--*** needs semicolons *( ; )* at the end of every line. Also, it doesn't need to be on
 one line, just go crazy. Just don't forget to put a semicolon.
+* To ***compile*** the interpreter, sometimes you need to run `gcc runner.cpp -lstdc++ -o amm_interpreter`. 
 
 ### `log`
 `log` is a keyword to print text to the console, it is used like this:

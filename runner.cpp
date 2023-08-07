@@ -3,10 +3,16 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#ifdef mod_enabled
+    #include <json/value.h> // For keyword modding
+#endif
 
 using namespace std;
 
 // Available Keywords in A--
+
+bool mod_enabled = false; // Make this true to be able to mod the lang using JSON (still a WIP)
+
 vector<string> known_keywords = {
     "whatif",
     "orelse",
@@ -161,9 +167,6 @@ void run(const string& program) {
 
     for (char c : program) {
         if (keyword == "var") { // Handle variable declarations
-
-            // TODO: Add that variables can either be declared without type but with value or without value but with type
-            // TODO: Add `getvar` keyword to get variable base on its M-Address
 
             pause_scan = true;
 

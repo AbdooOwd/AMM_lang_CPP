@@ -54,6 +54,11 @@ bool strArrHas(vector<string> da_array, string what); // TODO: Add This strArrHa
     return find(variable_array.begin(), variable_array.end(), var_name) != variable_array.end();
 }*/
 
+bool isSpaceLine(char character) {
+    if (character == ' ' || character == '\n') return true;
+    else return false;
+}
+
 
 // Some checking funcs
 
@@ -171,7 +176,7 @@ void run(const string& program) {
             pause_scan = true;
 
             // Skip white spaces and move to variable name
-            if ((c == ' ' || c == '\n') && scanning_var_name == false && scanned_var_name == false) {
+            if (isSpaceLine(c) && scanning_var_name == false && scanned_var_name == false) {
                 scanning_var_name = true;
                 varNextScan = "name";
             }
@@ -185,7 +190,7 @@ void run(const string& program) {
                     if (c == ':') varNextScan = "type";
                     if (c == '=') varNextScan = "value";
 
-                } else if (c == ' ' || c == '\n') {
+                } else if (isSpaceLine(c)) {
                     continue;
                 } else {
                     var_name += c;
@@ -199,13 +204,13 @@ void run(const string& program) {
                     varNextScan = "value";
                     continue;
                 }
-                if (c == ' ' || c == '\n') continue;
+                if (isSpaceLine(c)) continue;
                 var_type += c;
                 continue;
             }
 
             if (c != ';' && varNextScan == "value") {
-                if (c == ' ' || c == '\n') continue;
+                if (isSpaceLine(c)) continue;
                 var_value += c;
                 continue;
             }

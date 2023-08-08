@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+
 #ifdef mod_enabled
     #include <json/value.h> // For keyword modding
 #endif
@@ -181,6 +182,9 @@ string getVarValue(vector<Variable> variable_array, int m_address) {
 void run(const string& program) {
     string keyword = "";
     bool pause_scan = false;
+
+    // Comment detection
+    bool isComment = false;
 
     // Any scanning stuff
     string scanned_thing = "";
@@ -444,7 +448,21 @@ void run(const string& program) {
             keyword += c;
         }
 
-        if (c == ';') { // TODO: Add comments
+        if (isComment == true && c == '\n') {
+            resetToDefault(keyword);
+            pause_scan = false;
+            isComment = false;
+            continue;
+        }
+
+        if (c == '#' && isComment == false) { // TODO: Add comments
+        resetToDefault(keyword);
+            pause_scan = true;
+            isComment = true;
+            continue;
+        }
+
+        if (c == ';') {
             keyword = "";
             continue;
         }

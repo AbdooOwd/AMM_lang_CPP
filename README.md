@@ -43,4 +43,5 @@ The text between the double quotes *( " )* is a ***String***. It is a common dat
 in programming languages.
 
 ## Resources - Useful links
+* Project's [Github docs](./docs/CHATGPT_docs.md)
 * Project's [**Notion** page](https://www.notion.so/A-Lang-33ed6d9812234401af6595a853c4aa29?pvs=4)

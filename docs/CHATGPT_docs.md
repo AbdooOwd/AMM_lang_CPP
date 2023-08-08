@@ -1,7 +1,8 @@
 # A-- Programming Language Documentation
 
 ## Introduction
-A-- is a simple programming language designed for [describe the purpose of your language]. It features [mention key features of your language].
+A-- is a simple programming language made for fun. It features simple stuff.
+The only original thing in this language is the [**M-Address**]()
 
 ## Table of Contents
 - [Keywords](#keywords)
@@ -11,6 +12,7 @@ A-- is a simple programming language designed for [describe the purpose of your 
 - [Variables](#variables)
 - [Input and Output](#input-and-output)
 - [Comments](#comments)
+- [M-Addresses](#m-address)
 - [Examples](#examples)
 - [Getting Started](#getting-started)
 
@@ -26,17 +28,11 @@ The following keywords are available in A--:
 
 ## Data Types
 A-- supports the following data types:
-- `int`: [Explain the purpose and usage of this data type]
-- `float`: [Explain the purpose and usage of this data type]
-- `str`: [Explain the purpose and usage of this data type]
-- `bool`: [Explain the purpose and usage of this data type]
-- `array`: [Explain the purpose and usage of this data type]
-
-## Functions
-A-- provides the following functions:
-- `resetToDefault(T& variable)`: [Explain the purpose and usage of this function]
-- `resetArrVars(vector<T> arr)`: [Explain the purpose and usage of this function]
-- `arrayHas(vector<T>& arr, const T& element)`: [Explain the purpose and usage of this function]
+- `int`
+- `float`
+- `str`
+- `bool`
+- `array`
 
 ## Math Operations
 The `math` keyword allows you to perform basic math operations. You can use the following math operators:
@@ -71,9 +67,22 @@ Comments in A-- are denoted by the # symbol. Example:
 
 ```A
 # This is a comment
-Examples
-Here are some examples of A-- code snippets:
 ```
+
+## M-Addresses
+An **M-Address** is the number used to get a variable in A-- (see [variables](#variables))
+Example:
+```A
+var name: str = "AbdooOwd";
+getvar 0;
+```
+Because I am too lazy to make the interpreter get the variable
+by using its name, it uses its 'M-Address'. And we see that we 
+use `getvar` to get the variable's value using its **M-Address**.
+
+## Examples
+Here are some examples of A-- code snippets:
+
 ### Example 1: Basic Output
 ```A
 log "Hello, world!";

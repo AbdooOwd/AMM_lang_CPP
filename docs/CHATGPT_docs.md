@@ -12,7 +12,7 @@ The only original thing in this language is the [**M-Address**]()
 - [Variables](#variables)
 - [Input and Output](#input-and-output)
 - [Comments](#comments)
-- [M-Addresses](#m-address)
+- [M-Addresses](#m-addresses)
 - [Examples](#examples)
 - [Getting Started](#getting-started)
 

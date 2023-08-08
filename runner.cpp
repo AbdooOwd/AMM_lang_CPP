@@ -14,12 +14,20 @@ using namespace std;
 bool mod_enabled = false; // Make this true to be able to mod the lang using JSON (still a WIP)
 
 vector<string> known_keywords = {
-    "whatif",
+    "whatif", // TODO: Add if system
     "orelse",
     "endif",
     "log",
     "input",
-    "var"
+    "var",
+    "math"
+};
+
+vector<string> math_operators = {
+    "+",
+    "-",
+    "*",
+    "/"
 };
 
 // Available Data types in A--
@@ -42,13 +50,39 @@ string getVar(vector<Variable> variable_array, int m_address);
 
 
 
-// Tools funcs
+// ### Tools funcs
 
-// TODO: Add a function that takes an array of variables and resets each one
-void reset_props();
+// Function template to reset any variable to its default value
+template <typename T>
+void resetToDefault(T& variable) {
+    if constexpr (std::is_same_v<T, bool>) {
+        variable = false; // Set boolean variables to true
+    } else if constexpr (is_same_v<T, string>) {
+        variable = "";
+    } else if constexpr (is_same_v<T, int>) {
+        variable = 0;
+    } else if constexpr (is_same_v<T, double>) {
+        variable = 0.0;
+    }
+    
+    else {
+        variable = T{}; // Assign the default value to the variable
+    }
+}
+
+template <typename T>
+void resetArrVars(vector<T> arr) {
+    for (T var : arr) {
+        resetToDefault(var);
+    }
+}
 
 // To check if an array has a certain element inside it
-bool strArrHas(vector<string> da_array, string what); // TODO: Add This strArrHas func
+template <typename T>
+bool arrayHas(vector<T>& arr, const T& element) {
+    auto it = find(arr.begin(), arr.end(), element);
+    return (it != arr.end());
+}
 
 /*bool varExists(vector<Variable> variable_array, string var_name) {
     return find(variable_array.begin(), variable_array.end(), var_name) != variable_array.end();
@@ -148,21 +182,27 @@ void run(const string& program) {
     string keyword = "";
     bool pause_scan = false;
 
-    // Str scanning stuff
+    // Any scanning stuff
+    string scanned_thing = "";
+    int i_counter = 0;
+
+    // --- log
     bool scanning_str = false;
     string scanned_str = "";
     int double_quotes_count = 0;
 
-    // Vars
+    // --- Vars
     vector<Variable> variables;
     
     string var_name;
     string var_type;
     string var_value;
+    string varNextScan = "name";
+
     int space_count = 0;
     bool scanning_var_name = false;
     bool scanned_var_name = false;
-    string varNextScan = "name";
+
     enum VarNextScan {
         VAR_NAME,
         VAR_TYPE,
@@ -170,7 +210,96 @@ void run(const string& program) {
     };
 
 
+    // Var resetting
+    vector<string> var_props_str = {
+        var_name,
+        var_type,
+        var_value
+    };
+    vector<bool> var_props_bool = {
+        scanning_var_name,
+        scanned_var_name
+    };
+
+    // --- math
+    bool start_scan = false;
+    bool show_work = false;
+    int number1 = NULL;
+    int number2 = NULL;
+    string cur_operator = "";
+
     for (char c : program) {
+
+        if (keyword == "math") {
+
+            pause_scan = true;
+
+            if (isSpaceLine(c)) continue;
+
+            if (c == '_') show_work = true;
+
+            if (c != ' ' && start_scan == false) {
+                start_scan = true;
+            }
+
+            if (start_scan == true) {
+                if (isSpaceLine(c)) continue;
+
+                if ((  arrayHas<string>(math_operators, string(1, c))  ) || (c == ';')) {
+                    if (arrayHas<string>(math_operators, string(1, c))) {
+                        cur_operator = string(1, c);
+                    }
+                    
+                    if (number1 == NULL) {
+                        number1 = stoi(scanned_thing);
+                    } else {
+                        number2 = stoi(scanned_thing);
+                    }
+                    resetToDefault(scanned_thing);
+                    //continue;
+                }
+                if (!isSpaceLine(c) && c != ';' && c != '.' && c != '_'
+                 && !(arrayHas<string>(math_operators, string(1, c)))) {
+                    scanned_thing += c;
+                    continue;
+                }
+            }
+
+            if ((number1 != NULL) && (number2 != NULL)) {
+                //cout << "Mathy: " << number1 << " " << cur_operator << " " << number2 << endl;
+                //cout << "Result: " << (number1 + number2) << endl;
+
+                double result = 0.0;
+
+                if (cur_operator == "+") {
+                    result = (number1+number2);
+                } else if (cur_operator == "-") {
+                    result = (number1-number2);
+                } else if (cur_operator == "/") {
+                    result = (number1/number2);
+                } else if (cur_operator == "*") {
+                    result = (number1*number2);
+                }
+
+                if (show_work == true)
+                    cout << number1 << " " << cur_operator << " " << number2 << " = " << result << endl;
+                else
+                    cout << result << endl;
+                
+                start_scan = false;
+            }
+
+            if (c == ';') {
+                resetToDefault(keyword);
+                resetToDefault(scanned_thing);
+                number1 = NULL;
+                number2 = NULL;
+                resetToDefault(cur_operator);
+                resetToDefault(start_scan);
+                pause_scan = false;
+            }
+        }
+
         if (keyword == "var") { // Handle variable declarations
 
             pause_scan = true;
@@ -215,26 +344,30 @@ void run(const string& program) {
                 continue;
             }
 
-            //cout << " - Var: " << var_name << " | Type: " << var_type << endl;
+            if (c == ';') {
+                // Add the variable to the list
+                Variable new_var;
+                new_var.name = var_name;
+                if (var_type != "") new_var.type = var_type;
+                if (var_value != "") new_var.value = var_value; // Initialize with an empty value (coming soon [; )
+                variables.push_back(new_var);
 
-            // Add the variable to the list
-            Variable new_var;
-            new_var.name = var_name;
-            if (var_type != "") new_var.type = var_type;
-            if (var_value != "") new_var.value = var_value; // Initialize with an empty value (coming soon [; )
-            variables.push_back(new_var);
+                // Resets the var scanning properties
+                /*var_name = "";
+                var_type = "";
+                var_value = "";
+                space_count = 0;
+                scanning_var_name = false;
+                scanned_var_name = false;*/
 
-            // Resets the var scanning properties
-            var_name = "";
-            var_type = "";
-            var_value = "";
-            space_count = 0;
-            scanning_var_name = false;
-            scanned_var_name = false;
+                resetArrVars(var_props_str);
+                resetArrVars(var_props_bool);
+                resetToDefault(space_count);
 
-            keyword = ""; // Reset the keyword
+                keyword = ""; // Reset the keyword
 
-            pause_scan = false;
+                pause_scan = false;
+            }
         }
 
         if (keyword == "log") { // Handle log statements

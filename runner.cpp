@@ -64,6 +64,8 @@ void resetToDefault(T& variable) {
         variable = 0;
     } else if constexpr (is_same_v<T, double>) {
         variable = 0.0;
+    } else if constexpr (is_same_v<T, char>) {
+        variable = NULL;
     }
     
     else {
@@ -232,7 +234,41 @@ void run(const string& program) {
     int number2 = NULL;
     string cur_operator = "";
 
+    // --- If stuff
+    bool isInCondition = false;
+    string condition1 = "";
+    string condition2 = "";
+    char conditioner = NULL;
+
     for (char c : program) {
+
+        if (keyword == "whatif") { // TODO finish if
+
+            if (isSpaceLine(c)) continue;
+
+            if (condition1 != "" && condition2 != "") {
+                cout << "Condition!" << endl;
+                cout << condition1 << conditioner << condition2 << endl;
+            }
+
+            if (c == '>' || c == '<' || c == '=' || c == '{'/* || c == ';'*/) {
+
+                if (condition1 == "") condition1 = scanned_thing;
+                else condition2 = scanned_thing;
+
+                resetToDefault(scanned_thing);
+                if (conditioner == NULL) {
+                    conditioner = c;
+                }
+
+                continue;
+            }
+
+            if (c != '<' && c != '>' && c != '=' && c != ';') {
+                scanned_thing += c;
+                continue;
+            }
+        }
 
         if (keyword == "math") {
 
@@ -455,7 +491,7 @@ void run(const string& program) {
             continue;
         }
 
-        if (c == '#' && isComment == false) { // TODO: Add comments
+        if (c == '#' && isComment == false) {
         resetToDefault(keyword);
             pause_scan = true;
             isComment = true;

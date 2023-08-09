@@ -14,6 +14,9 @@ using namespace std;
 
 bool mod_enabled = false; // Make this true to be able to mod the lang using JSON (still a WIP)
 
+// Error handling (not sophisticated)
+bool errorFound = false;
+
 vector<string> known_keywords = {
     "whatif", // TODO: Add if system
     "orelse",
@@ -46,9 +49,61 @@ struct Variable {
     string value;
 };
 
+
+// Originally in run func
+
+string keyword = "";
+bool pause_scan = false;
+// Comment detection
+bool isComment = false;
+// Any scanning stuff
+string scanned_thing = "";
+int i_counter = 0;
+int cur_line = 1;
+// --- log
+bool scanning_str = false;
+string scanned_str = "";
+int double_quotes_count = 0;
+// --- Vars
+vector<Variable> variables;
+    
+string var_name;
+string var_type;
+string var_value;
+string varNextScan = "name";
+int space_count = 0;
+bool scanning_var_name = false;
+bool scanned_var_name = false;
+enum VarNextScan {
+    VAR_NAME,
+    VAR_TYPE,
+    VAR_VALUE
+};
+// Var resetting
+vector<string> var_props_str = {
+    var_name,
+    var_type,
+    var_value
+};
+vector<bool> var_props_bool = {
+    scanning_var_name,
+    scanned_var_name
+};
+// --- math
+bool start_scan = false;
+bool show_work = false;
+int number1 = NULL;
+int number2 = NULL;
+string cur_operator = "";
+// --- If stuff
+bool isInCondition = false;
+string condition1 = "";
+string condition2 = "";
+
+
+
+
 string getVar(vector<Variable> variable_array, int m_address);
-
-
 
 
 // ### Tools funcs
@@ -87,77 +142,10 @@ bool arrayHas(vector<T>& arr, const T& element) {
     return (it != arr.end());
 }
 
-/*bool varExists(vector<Variable> variable_array, string var_name) {
-    return find(variable_array.begin(), variable_array.end(), var_name) != variable_array.end();
-}*/
-
 bool isSpaceLine(char character) {
     if (character == ' ' || character == '\n') return true;
     else return false;
 }
-
-
-// Some checking funcs
-
-bool isInteger(const std::string& s) {
-    try {
-        size_t pos;
-        std::stoi(s, &pos);
-        return pos == s.length();
-    } catch (std::invalid_argument&) {
-        return false;
-    } catch (std::out_of_range&) {
-        return false;
-    }
-}
-
-bool isFloat(const std::string& s) {
-    try {
-        size_t pos;
-        std::stof(s, &pos);
-        return pos == s.length();
-    } catch (std::invalid_argument&) {
-        return false;
-    } catch (std::out_of_range&) {
-        return false;
-    }
-}
-
-bool isDouble(const std::string& s) {
-    try {
-        size_t pos;
-        std::stod(s, &pos);
-        return pos == s.length();
-    } catch (std::invalid_argument&) {
-        return false;
-    } catch (std::out_of_range&) {
-        return false;
-    }
-}
-
-bool isValidDataType(const string& type) {
-    return find(data_types.begin(), data_types.end(), type) != data_types.end();
-}
-
-bool isValidValueForType(const string& value, const string& type) {
-    if (type == "int") {
-        return isInteger(value);
-    } else if (type == "float") {
-        return isFloat(value);
-    } else if (type == "str") {
-        return true;
-    } else if (type == "bool") {
-        return (value == "true" || value == "false");
-    } else if (type == "array") {
-        // Implement the logic to check if the value is a valid array representation
-        // (e.g., "[1, 2, 3]") based on your language's array syntax rules.
-        // For simplicity, we'll skip this part in this example.
-        return true;
-    } else {
-        return false;
-    }
-}
-
 
 // A-- functions to work
 
@@ -171,6 +159,35 @@ string get_code(const string& file_path) {
     return code;
 }
 
+void show_err(string error_message) {
+    cout << "[ERROR] : " << cur_line <<" > " << error_message << endl;
+}
+
+template <typename T>
+bool check_condition() {
+
+    T t_condition1 = (T) condition1;
+    T t_condition2 = (T) condition2;
+
+    switch (conditioner) {
+        case '=':
+            if (t_condition1 == t_condition2) {
+                cout << true << endl;
+            }
+            break;
+
+        case '>': // TODO continue here
+            if (t_condition1 > t_condition2) {
+                cout 
+            }
+
+        default:
+            break;
+    }
+
+    return false;
+}
+
 // Variable funcs
 
 string getVarValue(vector<Variable> variable_array, int m_address) {
@@ -182,77 +199,26 @@ string getVarValue(vector<Variable> variable_array, int m_address) {
 
 
 void run(const string& program) {
-    string keyword = "";
-    bool pause_scan = false;
-
-    // Comment detection
-    bool isComment = false;
-
-    // Any scanning stuff
-    string scanned_thing = "";
-    int i_counter = 0;
-
-    // --- log
-    bool scanning_str = false;
-    string scanned_str = "";
-    int double_quotes_count = 0;
-
-    // --- Vars
-    vector<Variable> variables;
-    
-    string var_name;
-    string var_type;
-    string var_value;
-    string varNextScan = "name";
-
-    int space_count = 0;
-    bool scanning_var_name = false;
-    bool scanned_var_name = false;
-
-    enum VarNextScan {
-        VAR_NAME,
-        VAR_TYPE,
-        VAR_VALUE
-    };
-
-
-    // Var resetting
-    vector<string> var_props_str = {
-        var_name,
-        var_type,
-        var_value
-    };
-    vector<bool> var_props_bool = {
-        scanning_var_name,
-        scanned_var_name
-    };
-
-    // --- math
-    bool start_scan = false;
-    bool show_work = false;
-    int number1 = NULL;
-    int number2 = NULL;
-    string cur_operator = "";
-
-    // --- If stuff
-    bool isInCondition = false;
-    string condition1 = "";
-    string condition2 = "";
     char conditioner = NULL;
 
     for (char c : program) {
 
-        if (keyword == "whatif") { // TODO finish if
+        if (c == '\n') {
+            cur_line++;
+        }
+
+        if (keyword == "whatif") { // TODO perform actions based on the condition
+
+            if (isInCondition == true) {
+                show_err("Already in an 'if' statement");
+                break;
+            }
+
+            pause_scan = true;
 
             if (isSpaceLine(c)) continue;
 
-            if (condition1 != "" && condition2 != "") {
-                cout << "Condition!" << endl;
-                cout << condition1 << conditioner << condition2 << endl;
-            }
-
-            if (c == '>' || c == '<' || c == '=' || c == '{'/* || c == ';'*/) {
-
+            if (c == '>' || c == '<' || c == '=' || c == ';') {
                 if (condition1 == "") condition1 = scanned_thing;
                 else condition2 = scanned_thing;
 
@@ -260,14 +226,35 @@ void run(const string& program) {
                 if (conditioner == NULL) {
                     conditioner = c;
                 }
-
-                continue;
             }
 
             if (c != '<' && c != '>' && c != '=' && c != ';') {
                 scanned_thing += c;
                 continue;
             }
+
+            if (condition1 != "" && condition2 != "" && c == ';') {
+                isInCondition = true;
+
+                resetToDefault(keyword);
+
+                pause_scan = false;
+                continue;
+            }
+        }
+
+        if (keyword == "orelse" && isInCondition == true) {
+            // TODO: Add 'orelse'
+
+        }
+
+        if (keyword == "endif" && isInCondition == true) {
+            resetToDefault(conditioner);
+            resetToDefault(condition1);
+            resetToDefault(condition2);
+
+            isInCondition = false;
+            resetToDefault(keyword);
         }
 
         if (keyword == "math") {
@@ -518,6 +505,10 @@ int main(int argc, char* argv[]) {
     string code = get_code(filename);
 
     run(code); // This is where EVERYTHING happens
+
+    if (errorFound == true) {
+        return 1;
+    }
 
     return 0;
 }

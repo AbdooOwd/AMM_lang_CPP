@@ -3,12 +3,17 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <typeinfo>
 
 #ifdef mod_enabled
     #include <json/value.h> // For keyword modding
 #endif
 
 using namespace std;
+
+#pragma GCC diagnostic ignored "-Wconversion-null"
+#pragma GCC diagnostic ignored "-Wpointer-arith"
+
 
 // Available Keywords in A--
 
@@ -18,7 +23,7 @@ bool mod_enabled = false; // Make this true to be able to mod the lang using JSO
 bool errorFound = false;
 
 vector<string> known_keywords = {
-    "whatif", // TODO: Add if system
+    "whatif",
     "orelse",
     "endif",
     "log",
@@ -56,14 +61,20 @@ string keyword = "";
 bool pause_scan = false;
 // Comment detection
 bool isComment = false;
+
+
 // Any scanning stuff
 string scanned_thing = "";
 int i_counter = 0;
 int cur_line = 1;
+
+
 // --- log
 bool scanning_str = false;
 string scanned_str = "";
 int double_quotes_count = 0;
+
+
 // --- Vars
 vector<Variable> variables;
     
@@ -79,6 +90,8 @@ enum VarNextScan {
     VAR_TYPE,
     VAR_VALUE
 };
+
+
 // Var resetting
 vector<string> var_props_str = {
     var_name,
@@ -89,16 +102,22 @@ vector<bool> var_props_bool = {
     scanning_var_name,
     scanned_var_name
 };
+
+
 // --- math
 bool start_scan = false;
 bool show_work = false;
 int number1 = NULL;
 int number2 = NULL;
 string cur_operator = "";
+
+
 // --- If stuff
 bool isInCondition = false;
 string condition1 = "";
 string condition2 = "";
+char cur_conditioner = NULL;
+bool condition_success;
 
 
 
@@ -164,28 +183,24 @@ void show_err(string error_message) {
 }
 
 template <typename T>
-bool check_condition() {
-
-    T t_condition1 = (T) condition1;
-    T t_condition2 = (T) condition2;
-
-    switch (conditioner) {
+bool check_condition(const T& our_condition1, const T& our_condition2, char cur_conditioner) {
+    switch (cur_conditioner) {
         case '=':
-            if (t_condition1 == t_condition2) {
-                cout << true << endl;
-            }
-            break;
-
-        case '>': // TODO continue here
-            if (t_condition1 > t_condition2) {
-                cout 
-            }
-
+            return our_condition1 == our_condition2;
+        case '>':
+            return our_condition1 > our_condition2;
+        case '<':
+            return our_condition1 < our_condition2;
         default:
-            break;
+            return false;
     }
+}
 
-    return false;
+bool lazy_check_cond(string cond1, string cond2, char condener) {
+    cout << cond1 << " " << cond2 << " " << condener << endl;
+
+    if (cond1 == cond2) return true;
+    else return false;
 }
 
 // Variable funcs
@@ -207,7 +222,7 @@ void run(const string& program) {
             cur_line++;
         }
 
-        if (keyword == "whatif") { // TODO perform actions based on the condition
+        if (keyword == "whatif") {
 
             if (isInCondition == true) {
                 show_err("Already in an 'if' statement");
@@ -234,21 +249,32 @@ void run(const string& program) {
             }
 
             if (condition1 != "" && condition2 != "" && c == ';') {
-                isInCondition = true;
+                cur_conditioner = conditioner;
 
+                // Checking the success of the condition
+                condition_success = check_condition(condition1, condition2, conditioner);
+
+                if (condition_success) {
+
+                    pause_scan = false;
+                } else {
+                    pause_scan = true;
+                }
+
+                isInCondition = true; // We start the IF statemen
                 resetToDefault(keyword);
-
-                pause_scan = false;
+                
                 continue;
             }
         }
 
-        if (keyword == "orelse" && isInCondition == true) {
+        else if (keyword == "orelse" && isInCondition == true) {
             // TODO: Add 'orelse'
 
         }
 
-        if (keyword == "endif" && isInCondition == true) {
+        else if (keyword == "endif" && isInCondition == true) {
+
             resetToDefault(conditioner);
             resetToDefault(condition1);
             resetToDefault(condition2);
@@ -257,7 +283,7 @@ void run(const string& program) {
             resetToDefault(keyword);
         }
 
-        if (keyword == "math") {
+        else if (keyword == "math") {
 
             pause_scan = true;
 
@@ -327,7 +353,7 @@ void run(const string& program) {
             }
         }
 
-        if (keyword == "var") { // Handle variable declarations
+        else if (keyword == "var") { // Handle variable declarations
 
             pause_scan = true;
 
@@ -397,7 +423,7 @@ void run(const string& program) {
             }
         }
 
-        if (keyword == "log") { // Handle log statements
+        else if (keyword == "log") { // Handle log statements
             pause_scan = true;
 
             bool new_line = true;
@@ -438,14 +464,14 @@ void run(const string& program) {
             }
         }
 
-        if (keyword == "input") { // Handle input statements
+        else if (keyword == "input") { // Handle input statements
             string user_input;
             cin >> user_input;
             // You might want to handle type conversion here based on the variable's data type.
             // For simplicity, we'll skip this part in this example.
         }
 
-        if (keyword == "getvar") {
+        else if (keyword == "getvar") {
             pause_scan = true;
 
             int m_address;
@@ -461,24 +487,24 @@ void run(const string& program) {
         }
 
         // DEV
-        if (keyword == "getvars") {
+        else if (keyword == "getvars") {
             for (int i = 0; i < sizeof(variables); i++) {
                 cout << variables[i].name << ": " << variables[i].type << " = " << variables[i].value << endl;
             }
         }
 
-        if (pause_scan == false && c != ';' && c != '\n' && c != ' ') {
+        else if (pause_scan == false && c != ';' && c != '\n' && c != ' ') {
             keyword += c;
         }
 
-        if (isComment == true && c == '\n') {
+        else if (isComment == true && c == '\n') {
             resetToDefault(keyword);
             pause_scan = false;
             isComment = false;
             continue;
         }
 
-        if (c == '#' && isComment == false) {
+        else if (c == '#' && isComment == false) {
         resetToDefault(keyword);
             pause_scan = true;
             isComment = true;
@@ -486,6 +512,7 @@ void run(const string& program) {
         }
 
         if (c == ';') {
+            pause_scan = false;
             keyword = "";
             continue;
         }

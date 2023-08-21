@@ -10,3 +10,7 @@
 * **`var`** - declares vars: `var var_name: type = value;`
 * **`getvar`** - gets a variable based on its **M-Address**
 * **`getvars`** - ***DEV TOOL*** gets all the vars with their properties
+
+## Commands to run
+* **`gcc runner.cpp -lstdc++ -o amm_compiler`**
+* **`./amm_compiler program.amm`**

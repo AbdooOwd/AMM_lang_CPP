@@ -3,4 +3,4 @@ tests/*
 backups/*
 include/*
 *.exe
-*.amm
+program.amm

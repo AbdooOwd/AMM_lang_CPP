@@ -1,0 +1,26 @@
+log "Welcome to A--!~This is a programming language made for fun by @AbdooOwd!
+~I will now showcase some keywords, any input?";
+input;
+
+log "Let's make a variable called 'username' and assign to it a secret value";
+var username = AbdooOwd;
+
+log "So lt's get the value using its M-Address (0) and it is: "-;
+getvar 0;
+
+log "Now let's do some simple math, 2 + 3.~And showing our work of course!";
+math _ 2 + 3;
+
+log "That was cool!";
+
+log "Now the hard part, if statements...
+~Let's check that 5 is greater than 3.
+~If it is the case, then we'll print 'I DID IT!!!'";
+
+whatif 5 > 3;
+log "~I DID IT!!!";
+endif;
+
+log "~It should have worked. You can know if the message got printed";
+
+log "And that's it for now! See ya!";

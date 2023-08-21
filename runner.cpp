@@ -120,6 +120,12 @@ char cur_conditioner = NULL;
 bool condition_success;
 
 
+// Some Todos
+
+// TODO: Improve error handling
+// TODO: Add 'orelse'
+// TODO: Improve the if system with more conditions in one
+// TODO: Store input
 
 
 string getVar(vector<Variable> variable_array, int m_address);
@@ -269,7 +275,7 @@ void run(const string& program) {
         }
 
         else if (keyword == "orelse" && isInCondition == true) {
-            // TODO: Add 'orelse'
+            // Else system
 
         }
 

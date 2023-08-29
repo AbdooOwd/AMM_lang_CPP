@@ -483,10 +483,11 @@ void run(const string& program) {
             int m_address;
             string varValue;
 
-            if (c == ' ') continue;
+            if (c == ' ' || c == ';') continue;
 
-            m_address = (int) c;
-            varValue = getVarValue(variables, 0);
+            m_address = c - '0';
+            varValue = getVarValue(variables, m_address);
+            cout << "Ouais Benoit: " << m_address << endl; 
             cout << varValue << endl;
 
             pause_scan = false;

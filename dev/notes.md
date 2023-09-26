@@ -12,5 +12,5 @@
 * **`getvars`** - ***DEV TOOL*** gets all the vars with their properties
 
 ## Commands to run
-* **`gcc runner.cpp -lstdc++ -o amm_compiler`**
+* **`gcc runner.cpp -lstdc++ -o amm_interpreter`**
 * **`./amm_compiler program.amm`**

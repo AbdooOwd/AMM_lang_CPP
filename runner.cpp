@@ -212,6 +212,14 @@ bool lazy_check_cond(string cond1, string cond2, char condener) {
 // Variable funcs
 
 string getVarValue(vector<Variable> variable_array, int m_address) {
+
+int arr_size = 0; // FIXME: Add Array Size
+
+    if ((arr_size - 1) < m_address) {
+        cout << " Tried Getting: " << m_address << " - Array's size: " << arr_size << endl;
+        return "M_ADDRESS TOO BIG";
+    }
+
     string toReturn = variable_array[m_address].value;
     if (toReturn != "") return toReturn;
     else return "NULL";
@@ -480,13 +488,17 @@ void run(const string& program) {
         else if (keyword == "getvar") {
             pause_scan = true;
 
+            if (c == ';') continue;
+
             int m_address;
             string varValue;
 
             if (c == ' ') continue;
 
+            // FIXME: `c` not converting to int properly
+            cout << c << endl;
             m_address = (int) c;
-            varValue = getVarValue(variables, 0);
+            varValue = getVarValue(variables, m_address);
             cout << varValue << endl;
 
             pause_scan = false;

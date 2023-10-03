@@ -493,7 +493,7 @@ void run(const string& program) {
             int m_address;
             string varValue;
 
-            if (c == ' ') continue;
+            if (c == ' ' || c == ';') continue;
 
             // FIXME: `c` not converting to int properly
             cout << c << endl;
